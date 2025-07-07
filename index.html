@@ -17,14 +17,20 @@
             background-color: #FF3B30;
             color: #FFD60A;
             font-family: 'Inter', sans-serif;
-            overflow: hidden;
-            height: 100vh;
-            height: 100dvh; /* dynamic viewport height for mobile */
+            overflow-x: hidden;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             -webkit-tap-highlight-color: transparent;
+        }
+        
+        body.touching .ai {
+            text-shadow: 
+                0 0 80px rgba(255, 214, 10, 1),
+                0 0 160px rgba(255, 214, 10, 0.6),
+                0 4px 20px rgba(0, 0, 0, 0.2);
         }
         
         .container {
@@ -58,9 +64,8 @@
             text-shadow: 
                 0 0 40px rgba(255, 214, 10, 0.4),
                 0 0 80px rgba(255, 214, 10, 0.2);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), text-shadow 0.3s ease;
             cursor: grab;
-            touch-action: none;
         }
         
         .ai:active {
@@ -127,15 +132,6 @@
         
         /* Mobile optimizations */
         @media (max-width: 768px) {
-            body {
-                height: 100vh;
-                height: -webkit-fill-available; /* iOS fix */
-            }
-            
-            .container {
-                padding: 10px;
-            }
-            
             .ai-wrapper {
                 gap: 0.05em;
                 overflow-x: auto;
@@ -146,7 +142,6 @@
                 padding: 0 20px;
                 margin: 0 -20px;
                 scroll-behavior: smooth;
-                font-size: clamp(100px, 22vw, 300px);
             }
             
             .ai-wrapper::-webkit-scrollbar {
@@ -158,12 +153,12 @@
             }
             
             .contact {
-                margin-top: 30px;
-                margin-bottom: 60px;
+                margin-top: 60px;
+                margin-bottom: 80px;
             }
             
             .footer {
-                bottom: 15px;
+                bottom: 20px;
                 font-size: 12px;
             }
         }
@@ -209,84 +204,61 @@
     <div class="footer">currently exploring... the inevitable phone</div>
     
     <script>
-        // Mobile scroll hint animation
-        const aiWrapper = document.getElementById('aiWrapper');
-        let hasScrolled = false;
+        const ais = document.querySelectorAll('.ai');
         
-        if (window.innerWidth <= 768) {
-            // Check if content overflows
-            setTimeout(() => {
-                if (aiWrapper.scrollWidth > aiWrapper.clientWidth && !hasScrolled) {
-                    // Subtle scroll hint
-                    aiWrapper.scrollLeft = 50;
-                    setTimeout(() => {
-                        if (!hasScrolled) {
-                            aiWrapper.scrollLeft = 0;
-                        }
-                    }, 500);
-                }
-            }, 1000);
-            
-            // Track if user has scrolled
-            aiWrapper.addEventListener('scroll', () => {
-                hasScrolled = true;
-            });
-        }
-        
-        // Add subtle parallax effect on mouse move (desktop only)
-        if (window.innerWidth > 768) {
+        // Mouse movement for desktop
+        if ('ontouchstart' in window === false) {
             document.addEventListener('mousemove', (e) => {
-                const ais = document.querySelectorAll('.ai');
                 const x = (e.clientX / window.innerWidth - 0.5) * 2;
                 const y = (e.clientY / window.innerHeight - 0.5) * 2;
                 
                 ais.forEach((ai, index) => {
                     const baseRotation = index === 0 ? -2 : index === 1 ? 1 : -1;
                     const translateY = index === 1 ? -5 : 0;
-                    ai.style.transform = `rotate(${baseRotation + x * 0.5}deg) translateY(${translateY + y * 2}px)`;
+                    ai.style.transform = `rotate(${baseRotation + x * 2}deg) translateY(${translateY + y * 5}px)`;
                 });
             });
         }
         
-        // Touch interaction for mobile
+        // Touch handling
         let touchStartX = null;
         let touchStartY = null;
         
-        // Only apply touch interaction to the container, not the scrollable area
-        const container = document.querySelector('.container');
-        
-        container.addEventListener('touchstart', (e) => {
-            // Don't interfere with the scrollable AI wrapper
-            if (e.target.closest('.ai-wrapper')) return;
-            
+        document.addEventListener('touchstart', (e) => {
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
+            document.body.classList.add('touching');
         });
         
-        container.addEventListener('touchmove', (e) => {
-            if (!touchStartX || !touchStartY) return;
-            if (e.target.closest('.ai-wrapper')) return;
+        document.addEventListener('touchmove', (e) => {
+            if (touchStartX === null || touchStartY === null) return;
             
-            const ais = document.querySelectorAll('.ai');
-            const currentX = e.touches[0].clientX;
-            const currentY = e.touches[0].clientY;
+            // Don't interfere with horizontal scrolling on the AI wrapper
+            if (e.target.closest('.ai-wrapper')) {
+                const wrapper = e.target.closest('.ai-wrapper');
+                if (wrapper.scrollWidth > wrapper.clientWidth) {
+                    return;
+                }
+            }
             
-            const deltaX = (currentX - touchStartX) / window.innerWidth;
-            const deltaY = (currentY - touchStartY) / window.innerHeight;
+            e.preventDefault();
+            
+            const deltaX = (e.touches[0].clientX - touchStartX) / window.innerWidth;
+            const deltaY = (e.touches[0].clientY - touchStartY) / window.innerHeight;
             
             ais.forEach((ai, index) => {
                 const baseRotation = index === 0 ? -2 : index === 1 ? 1 : -1;
                 const translateY = index === 1 ? -5 : 0;
-                ai.style.transform = `rotate(${baseRotation + deltaX * 5}deg) translateY(${translateY + deltaY * 20}px)`;
+                ai.style.transform = `rotate(${baseRotation + deltaX * 30}deg) translateY(${translateY + deltaY * 100}px)`;
             });
-        });
+        }, { passive: false });
         
-        container.addEventListener('touchend', () => {
+        document.addEventListener('touchend', () => {
             touchStartX = null;
             touchStartY = null;
+            document.body.classList.remove('touching');
             
             // Reset to original positions
-            const ais = document.querySelectorAll('.ai');
             ais.forEach((ai, index) => {
                 const baseRotation = index === 0 ? -2 : index === 1 ? 1 : -1;
                 const translateY = index === 1 ? -5 : 0;
