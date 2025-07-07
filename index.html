@@ -23,6 +23,7 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .container {
@@ -43,6 +44,11 @@
             letter-spacing: -0.02em;
             margin-bottom: 0.2em;
             white-space: nowrap;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
         }
         
         .ai {
@@ -52,6 +58,12 @@
                 0 0 40px rgba(255, 214, 10, 0.4),
                 0 0 80px rgba(255, 214, 10, 0.2);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: grab;
+            touch-action: none;
+        }
+        
+        .ai:active {
+            cursor: grabbing;
         }
         
         .ai:nth-child(1) {
@@ -221,13 +233,20 @@
         let touchStartX = null;
         let touchStartY = null;
         
-        document.addEventListener('touchstart', (e) => {
+        // Only apply touch interaction to the container, not the scrollable area
+        const container = document.querySelector('.container');
+        
+        container.addEventListener('touchstart', (e) => {
+            // Don't interfere with the scrollable AI wrapper
+            if (e.target.closest('.ai-wrapper')) return;
+            
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
         });
         
-        document.addEventListener('touchmove', (e) => {
+        container.addEventListener('touchmove', (e) => {
             if (!touchStartX || !touchStartY) return;
+            if (e.target.closest('.ai-wrapper')) return;
             
             const ais = document.querySelectorAll('.ai');
             const currentX = e.touches[0].clientX;
@@ -243,7 +262,7 @@
             });
         });
         
-        document.addEventListener('touchend', () => {
+        container.addEventListener('touchend', () => {
             touchStartX = null;
             touchStartY = null;
             
