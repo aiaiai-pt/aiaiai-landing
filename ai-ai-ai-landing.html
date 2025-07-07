@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI AI AI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #FF3B30;
+            color: #FFD60A;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            max-width: 1400px;
+        }
+        
+        .ai-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            gap: 0.1em;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(120px, 25vw, 380px);
+            line-height: 0.85;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.2em;
+            white-space: nowrap;
+        }
+        
+        .ai {
+            display: inline-block;
+            font-weight: 400;
+            text-shadow: 
+                0 0 40px rgba(255, 214, 10, 0.4),
+                0 0 80px rgba(255, 214, 10, 0.2);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .ai:nth-child(1) {
+            transform: rotate(-2deg);
+        }
+        
+        .ai:nth-child(2) {
+            transform: rotate(1deg) translateY(-5px);
+        }
+        
+        .ai:nth-child(3) {
+            transform: rotate(-1deg);
+        }
+        
+        .dot {
+            font-size: 0.8em;
+            vertical-align: middle;
+            opacity: 0.9;
+        }
+        
+        .contact {
+            font-size: clamp(14px, 2.5vw, 20px);
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            opacity: 0.9;
+            margin-top: 40px;
+            transition: opacity 0.3s ease;
+        }
+        
+        .contact:hover {
+            opacity: 1;
+            text-shadow: 0 0 20px rgba(255, 214, 10, 0.5);
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: clamp(12px, 2vw, 16px);
+            font-weight: 300;
+            letter-spacing: 0.08em;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+            padding: 0 20px;
+        }
+        
+        .footer:hover {
+            opacity: 0.9;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .ai-wrapper {
+                gap: 0.05em;
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                padding: 0 20px;
+                margin: 0 -20px;
+                scroll-behavior: smooth;
+            }
+            
+            .ai-wrapper::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .ai {
+                flex-shrink: 0;
+            }
+            
+            .contact {
+                margin-top: 60px;
+                margin-bottom: 80px;
+            }
+            
+            .footer {
+                bottom: 20px;
+                font-size: 12px;
+            }
+        }
+        
+        /* Playful hover effect on desktop */
+        @media (hover: hover) {
+            .ai:hover {
+                transform: scale(1.05) rotate(0deg) !important;
+                text-shadow: 
+                    0 0 60px rgba(255, 214, 10, 0.6),
+                    0 0 120px rgba(255, 214, 10, 0.3);
+            }
+        }
+        
+        /* Loading animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .container {
+            animation: fadeIn 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="ai-wrapper" id="aiWrapper">
+            <span class="ai">AI</span>
+            <span class="ai">AI</span>
+            <span class="ai">AI</span>
+            <span class="dot">.</span>
+        </div>
+        <div class="contact">hello@nomadriver.co</div>
+    </div>
+    
+    <div class="footer">currently exploring... the inevitable phone</div>
+    
+    <script>
+        // Mobile scroll hint animation
+        const aiWrapper = document.getElementById('aiWrapper');
+        let hasScrolled = false;
+        
+        if (window.innerWidth <= 768) {
+            // Check if content overflows
+            setTimeout(() => {
+                if (aiWrapper.scrollWidth > aiWrapper.clientWidth && !hasScrolled) {
+                    // Subtle scroll hint
+                    aiWrapper.scrollLeft = 50;
+                    setTimeout(() => {
+                        if (!hasScrolled) {
+                            aiWrapper.scrollLeft = 0;
+                        }
+                    }, 500);
+                }
+            }, 1000);
+            
+            // Track if user has scrolled
+            aiWrapper.addEventListener('scroll', () => {
+                hasScrolled = true;
+            });
+        }
+        
+        // Add subtle parallax effect on mouse move (desktop only)
+        if (window.innerWidth > 768) {
+            document.addEventListener('mousemove', (e) => {
+                const ais = document.querySelectorAll('.ai');
+                const x = (e.clientX / window.innerWidth - 0.5) * 2;
+                const y = (e.clientY / window.innerHeight - 0.5) * 2;
+                
+                ais.forEach((ai, index) => {
+                    const baseRotation = index === 0 ? -2 : index === 1 ? 1 : -1;
+                    const translateY = index === 1 ? -5 : 0;
+                    ai.style.transform = `rotate(${baseRotation + x * 0.5}deg) translateY(${translateY + y * 2}px)`;
+                });
+            });
+        }
+        
+        // Touch interaction for mobile
+        let touchStartX = null;
+        let touchStartY = null;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (!touchStartX || !touchStartY) return;
+            
+            const ais = document.querySelectorAll('.ai');
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            
+            const deltaX = (currentX - touchStartX) / window.innerWidth;
+            const deltaY = (currentY - touchStartY) / window.innerHeight;
+            
+            ais.forEach((ai, index) => {
+                const baseRotation = index === 0 ? -2 : index === 1 ? 1 : -1;
+                const translateY = index === 1 ? -5 : 0;
+                ai.style.transform = `rotate(${baseRotation + deltaX * 5}deg) translateY(${translateY + deltaY * 20}px)`;
+            });
+        });
+        
+        document.addEventListener('touchend', () => {
+            touchStartX = null;
+            touchStartY = null;
+            
+            // Reset to original positions
+            const ais = document.querySelectorAll('.ai');
+            ais.forEach((ai, index) => {
+                const baseRotation = index === 0 ? -2 : index === 1 ? 1 : -1;
+                const translateY = index === 1 ? -5 : 0;
+                ai.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                ai.style.transform = `rotate(${baseRotation}deg) translateY(${translateY}px)`;
+                
+                setTimeout(() => {
+                    ai.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html>
