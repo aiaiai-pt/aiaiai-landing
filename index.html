@@ -17,8 +17,9 @@
             background-color: #FF3B30;
             color: #FFD60A;
             font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            min-height: 100vh;
+            overflow: hidden;
+            height: 100vh;
+            height: 100dvh; /* dynamic viewport height for mobile */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -82,6 +83,10 @@
             font-size: 0.8em;
             vertical-align: middle;
             opacity: 0.9;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         
         .contact {
@@ -110,6 +115,10 @@
             opacity: 0.7;
             transition: opacity 0.3s ease;
             padding: 0 20px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         
         .footer:hover {
@@ -118,6 +127,15 @@
         
         /* Mobile optimizations */
         @media (max-width: 768px) {
+            body {
+                height: 100vh;
+                height: -webkit-fill-available; /* iOS fix */
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
             .ai-wrapper {
                 gap: 0.05em;
                 overflow-x: auto;
@@ -128,6 +146,7 @@
                 padding: 0 20px;
                 margin: 0 -20px;
                 scroll-behavior: smooth;
+                font-size: clamp(100px, 22vw, 300px);
             }
             
             .ai-wrapper::-webkit-scrollbar {
@@ -139,12 +158,12 @@
             }
             
             .contact {
-                margin-top: 60px;
-                margin-bottom: 80px;
+                margin-top: 30px;
+                margin-bottom: 60px;
             }
             
             .footer {
-                bottom: 20px;
+                bottom: 15px;
                 font-size: 12px;
             }
         }
